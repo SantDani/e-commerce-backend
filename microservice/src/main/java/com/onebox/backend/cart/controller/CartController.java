@@ -1,10 +1,13 @@
 package com.onebox.backend.cart.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.onebox.backend.cart.model.Cart;
+import com.onebox.backend.cart.model.Product;
 import com.onebox.backend.cart.service.CartService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,30 +31,31 @@ public class CartController {
 
     @PostMapping
     public ResponseEntity<Cart> createCart() {
-        Cart cart = cartService.createCart();
-        return ResponseEntity.ok(cart);
+        return ResponseEntity.ok(cartService.createCart());
     }
 
     @GetMapping("/{id}")
-    public String getCardById(@RequestParam String param) {
-        return new String();
+    public ResponseEntity<Cart> getCardById(@PathVariable String cartId) {
+
+        return ResponseEntity.ok(cartService.getCartById(cartId));
     }
 
     @GetMapping("/all")
-    public String getAllCarts(@RequestParam String param) {
-        return new String();
+    public ResponseEntity<List<Cart>> getAllCarts() {
+        return ResponseEntity.ok(cartService.getAllsCarts());
     }
 
     @PutMapping("/{id}")
-    public String putMethodName(@PathVariable String id, @RequestBody String entity) {
-        // TODO: process PUT request
+    public ResponseEntity<Cart> updateCart(@PathVariable String id, @RequestBody List<Product> products) {
+        Cart updatedCart = cartService.addProductsToCart(id, products);
 
-        return entity;
+        return ResponseEntity.ok(updatedCart);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteCart(@PathVariable String id) {
-
+    public ResponseEntity<Void> deleteCart(@PathVariable String id) {
+        cartService.deleteCart(id);
+        return ResponseEntity.noContent().build();
     }
 
 }
