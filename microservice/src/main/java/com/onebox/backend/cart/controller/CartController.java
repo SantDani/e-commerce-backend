@@ -1,8 +1,10 @@
 package com.onebox.backend.cart.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.onebox.backend.cart.model.Cart;
 import com.onebox.backend.cart.service.CartService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,10 +27,9 @@ public class CartController {
     }
 
     @PostMapping
-    public String createCart(@RequestBody String entity) {
-        // TODO: process POST request
-
-        return entity;
+    public ResponseEntity<Cart> createCart() {
+        Cart cart = cartService.createCart();
+        return ResponseEntity.ok(cart);
     }
 
     @GetMapping("/{id}")
