@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.onebox.backend.cart.exception.model.CartException;
+import com.onebox.backend.cart.exception.model.ErrorCode;
 import com.onebox.backend.cart.model.Cart;
 import com.onebox.backend.cart.model.Product;
 import com.onebox.backend.cart.repository.CartRepository;
@@ -29,7 +31,6 @@ public class CartService {
     @Value("${cart.inactivity.minutes:10}")
     private int inactivityMinutes;
 
-    @Autowired
     public CartService(CartRepository cartRepository) {
         this.cartRepository = cartRepository;
     }
@@ -46,7 +47,10 @@ public class CartService {
         Cart cart = cartRepository.findById(id);
 
         if (cart == null) {
-            // TODO: Cart not found with ID
+            ErrorCode cartNotFound = ErrorCode.CART_NOT_FOUND;
+            throw new CartException(cartNotFound.getCode(),
+                    cartNotFound.getMessage() + " ID: " + id,
+                    cartNotFound.getHttpStatus());
         }
         return cart;
     }
@@ -60,13 +64,20 @@ public class CartService {
         Cart cart = cartRepository.findById(cartId);
 
         if (cart == null) {
-            // TODO: throw Cart not found with ID
+            // TODO: duplicate code with getCartById, check option to refactor
+            ErrorCode cartNotFound = ErrorCode.CART_NOT_FOUND;
+            throw new CartException(cartNotFound.getCode(),
+                    cartNotFound.getMessage() + " ID: " + cartId,
+                    cartNotFound.getHttpStatus());
         } else {
 
             for (Product product : products) {
                 // TODO: validate Product
                 if (product.getAmount() < 0) {
-                    // TODO: throw Amount cannot be negative
+                    ErrorCode cartNotFound = ErrorCode.AMOUNT_NEGATIVE;
+                    throw new CartException(cartNotFound.getCode(),
+                            cartNotFound.getMessage() + " ID: " + cartId,
+                            cartNotFound.getHttpStatus());
                 }
 
                 if (cart.getProducts().contains(product)) {
@@ -106,7 +117,7 @@ public class CartService {
                     logger.debug("Cart {} last accessed: {} < {}", item.getId(),
                             item.getLastAccessed().format(formatter), inactiveSince.format(formatter));
 
-                    System.out.printf("Cart %s last accessed: %s < %s%n", item.getId(),
+                    logger.debug("Cart %s last accessed: %s < %s%n", item.getId(),
                             item.getLastAccessed().format(formatter), inactiveSince.format(formatter));
                     return item.getLastAccessed().isBefore(inactiveSince);
                 })
