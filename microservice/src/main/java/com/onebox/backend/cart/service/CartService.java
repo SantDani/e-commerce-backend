@@ -29,9 +29,6 @@ public class CartService {
     @Value("${cart.inactivity.minutes:10}")
     private int inactivityMinutes;
 
-    @Value("${cart.cleanup.fixedRate:60000}")
-    private String cleanupFixedRate;
-
     @Autowired
     public CartService(CartRepository cartRepository) {
         this.cartRepository = cartRepository;
@@ -95,7 +92,7 @@ public class CartService {
         return cart;
     }
 
-    @Scheduled(fixedRateString = cleanupFixedRate)
+    @Scheduled(fixedRateString = "${cart.cleanup.fixedRate:60000}")
     public void removeInactiveCarts() {
 
         // TODO: test this method
