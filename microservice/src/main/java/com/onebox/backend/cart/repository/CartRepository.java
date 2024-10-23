@@ -62,7 +62,7 @@ public class CartRepository {
         if (id == null && cartStore.containsKey(id)) {
             cartStore.remove(id);
         } else {
-            ErrorCode invalidIdList = ErrorCode.Cart_NULL_EMPTY;
+            ErrorCode invalidIdList = ErrorCode.CART_NULL_EMPTY;
             throw new CartException(invalidIdList.getCode(),
                     invalidIdList.getMessage(),
                     invalidIdList.getHttpStatus());
@@ -88,7 +88,7 @@ public class CartRepository {
         if (ids == null || ids.isEmpty()) {
             ids.forEach(this::deleteById);
         } else {
-            ErrorCode invalidIdList = ErrorCode.Cart_NULL_EMPTY;
+            ErrorCode invalidIdList = ErrorCode.CART_NULL_EMPTY;
             throw new CartException(invalidIdList.getCode(),
                     invalidIdList.getMessage(),
                     invalidIdList.getHttpStatus());

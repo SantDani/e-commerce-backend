@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.onebox.backend.cart.exception.model.CartException;
 import com.onebox.backend.cart.exception.model.ErrorCode;
 import com.onebox.backend.cart.exception.model.ProductException;
 import com.onebox.backend.cart.model.Product;
@@ -46,22 +45,6 @@ public class BusinessValidator {
             ErrorCode errorCode = ErrorCode.VALIDATION_ERROR;
             throw new ProductException(errorCode.getCode(), errorCode.getMessage() + " " + errorMessage,
                     errorCode.getHttpStatus());
-        }
-    }
-
-    /**
-     * Validates the ID of a cart. If the ID is null or empty, a CartException is
-     * thrown with the appropriate error message and code.
-     * 
-     * @param id the ID to validate
-     * @throws CartException if the ID is null or empty
-     */
-    public void validateId(String id) {
-        if (id == null || id.trim().isEmpty()) {
-            ErrorCode nullEmpty = ErrorCode.CART_NOT_FOUND;
-            throw new CartException(nullEmpty.getCode(),
-                    nullEmpty.getMessage(),
-                    nullEmpty.getHttpStatus());
         }
     }
 

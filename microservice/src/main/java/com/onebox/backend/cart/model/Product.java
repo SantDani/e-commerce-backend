@@ -16,4 +16,19 @@ public class Product {
         this.description = description;
         this.amount = amount;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)// same object
+            return true;
+        if (o == null || getClass() != o.getClass()) // same class
+            return false;
+        Product product = (Product) o;
+        return id != null && id.equals(product.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
 }

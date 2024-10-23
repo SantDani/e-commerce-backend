@@ -19,6 +19,9 @@ import com.onebox.backend.cart.model.Product;
 import com.onebox.backend.cart.repository.CartRepository;
 import com.onebox.backend.cart.utils.BusinessValidator;
 
+/**
+ * Service class for managing shopping carts.
+ */
 @Service
 public class CartService {
 
@@ -33,11 +36,22 @@ public class CartService {
     @Value("${cart.inactivity.minutes:10}")
     private int inactivityMinutes;
 
+    /**
+     * Constructor CartRepository and BusinessValidator.
+     * 
+     * @param cartRepository the repository to store carts
+     * @param validator      the validator to validate business entities
+     */
     public CartService(CartRepository cartRepository, BusinessValidator validator) {
         this.cartRepository = cartRepository;
         this.validator = validator;
     }
 
+    /**
+     * Creates a new empty cart.
+     * 
+     * @return the newly created cart saved in the repository.
+     */
     public Cart createCart() {
         Cart cart = new Cart();
         return cartRepository.save(cart);
@@ -52,7 +66,7 @@ public class CartService {
      */
     public Cart getCartById(String id) {
 
-        validator.validateId(id);
+        validateId(id);
         Cart cart = cartRepository.findById(id);
 
         if (cart == null) {
@@ -64,16 +78,28 @@ public class CartService {
         return cart;
     }
 
+    /**
+     * Retrieves all carts stored in the repository.
+     * 
+     * @return list of all carts
+     */
     public List<Cart> getAllsCarts() {
         return cartRepository.findAll();
     }
 
+    /**
+     * Adds a list of products to the cart with the given ID.
+     * 
+     * @param cartId   the ID of the cart
+     * @param products the list of products to add
+     * @return the updated cart
+     */
     public Cart addProductsToCart(String cartId, List<Product> products) {
 
-        validator.validateId(cartId);
+        validateId(cartId);
 
         if (products == null || products.isEmpty()) {
-            ErrorCode invalidProductList = ErrorCode.Product_NULL_EMPTY;
+            ErrorCode invalidProductList = ErrorCode.PRODUCT_NULL_EMPTY;
             throw new CartException(invalidProductList.getCode(),
                     invalidProductList.getMessage(),
                     invalidProductList.getHttpStatus());
@@ -100,7 +126,6 @@ public class CartService {
                         .filter(item -> item.equals(product))
                         .findFirst();
                 if (existingProduct.isPresent()) {
-
                     existingProduct.get().setAmount(existingProduct.get().getAmount() + product.getAmount());
 
                 } else {
@@ -114,6 +139,12 @@ public class CartService {
         return cartRepository.save(cart);
     }
 
+    /**
+     * Deletes a cart by its ID.
+     * 
+     * @param id the ID of the cart to be deleted
+     * @return the deleted cart
+     */
     public Cart deleteCart(String id) {
         Cart cart = getCartById(id);
 
@@ -121,6 +152,9 @@ public class CartService {
         return cart;
     }
 
+    /**
+     * Scheduled task to remove inactive carts.
+     */
     @Scheduled(fixedRateString = "${cart.cleanup.fixedRate:60000}")
     public void removeInactiveCarts() {
 
@@ -145,6 +179,22 @@ public class CartService {
             logger.info("Removed {} inactive carts", numberOfInactiveCarts);
         } else {
             logger.debug("No inactive carts found to remove");
+        }
+    }
+
+    /**
+     * Validates the ID of a cart. If the ID is null or empty, a CartException is
+     * thrown with the appropriate error message and code.
+     * 
+     * @param id the ID to validate
+     * @throws CartException if the ID is null or empty
+     */
+    private void validateId(String id) {
+        if (id == null || id.trim().isEmpty()) {
+            ErrorCode nullEmpty = ErrorCode.CART_NOT_FOUND;
+            throw new CartException(nullEmpty.getCode(),
+                    nullEmpty.getMessage(),
+                    nullEmpty.getHttpStatus());
         }
     }
 }

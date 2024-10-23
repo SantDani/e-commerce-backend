@@ -1,4 +1,4 @@
-package com.onebox.backend.microservice;
+package com.onebox.backend.cart;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
