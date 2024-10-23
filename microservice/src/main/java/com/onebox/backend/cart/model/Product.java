@@ -1,12 +1,13 @@
 package com.onebox.backend.cart.model;
 
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 @Data
 public class Product {
 
     private Integer id;
-    // TODO: handle alphanumeric param
+    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "The description parameter is alphanumeric, therefore, only letters and numbers are allowed. No special characters or spaces are allowed.")
     private String description;
     private int amount;
 
