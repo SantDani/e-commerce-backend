@@ -21,7 +21,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import com.onebox.backend.cart.exception.model.CartException;
@@ -178,28 +177,6 @@ public class CartServiceTest {
         verify(productValidationService, times(2)).validateProduct(any(Product.class));
     }
 
-    // TODO: check coverage
-    // @Test
-    public void testAddProductsToCartCartNotFound() {
-        String invalidCartId = "-1";
-        when(cartRepository.findById(invalidCartId)).thenReturn(null);
-        List<Product> products = Arrays.asList(
-                new Product(1, "Product 1", 2),
-                new Product(2, "Product 2", 3));
-
-        CartException exception = assertThrows(CartException.class, () -> {
-            cartService.addProductsToCart(invalidCartId, products);
-        });
-
-        ErrorCode cartNotFound = ErrorCode.PRODUCT_NULL_EMPTY;
-        assertEquals(cartNotFound.getMessage(), exception.getMessage());
-        assertEquals(cartNotFound.getCode(), exception.getCode());
-        assertEquals(cartNotFound.getHttpStatus(), exception.getHttpStatus());
-
-        verify(cartRepository, times(1)).findById(invalidCartId); // Verify the cart fetch was attempted once
-        verify(cartRepository, times(0)).save(any(Cart.class)); // Ensure the cart is not saved
-    }
-
     @Test
     public void testAddProductsToCartNullProductList() {
         String cartId = "1";
@@ -222,27 +199,27 @@ public class CartServiceTest {
 
     @Test
     public void testAddProductsToCartLimitCases() {
-
+        // Negative case
         String cartId = "1";
         Cart cart = new Cart();
         cart.setId(cartId);
 
         when(cartRepository.findById(cartId)).thenReturn(cart);
 
-        // Case : Product with negative amount
-
-        Product productWithNegativeAmount = new Product(1, "Negative Product", -5);
+        Product productWithNegativeAmount = new Product(1, "Product1", -5);
+        Product validProduct = new Product(2, "Product2", 5);
 
         CartException exception = assertThrows(CartException.class, () -> {
-            cartService.addProductsToCart(cartId, List.of(productWithNegativeAmount));
+            cartService.addProductsToCart(cartId, Arrays.asList(productWithNegativeAmount, validProduct));
         });
 
-        ErrorCode cartNotFound = ErrorCode.AMOUNT_NEGATIVE;
-        assertEquals(cartNotFound.getMessage() + " ID: " + cartId, exception.getMessage());
-        assertEquals(cartNotFound.getCode(), exception.getCode());
-        assertEquals(cartNotFound.getHttpStatus(), exception.getHttpStatus());
+        ErrorCode amountNegative = ErrorCode.AMOUNT_NEGATIVE;
+        assertEquals(amountNegative.getMessage() + " ID: " + cartId, exception.getMessage());
+        assertEquals(amountNegative.getCode(), exception.getCode());
+        assertEquals(amountNegative.getHttpStatus(), exception.getHttpStatus());
 
         verify(cartRepository, times(1)).findById(cartId);
+        verify(cartRepository, times(0)).save(any(Cart.class));
     }
 
     @Test
@@ -332,21 +309,19 @@ public class CartServiceTest {
     @Test
     public void testRemoveInactiveCartsLimitCasesNoInactiveCarts() {
 
-        // ReflectionTestUtils.setField(cartService, "cleanupFixedRate", 60000);
-
         ReflectionTestUtils.setField(cartService, "inactivityMinutes", 10);
 
         LocalDateTime now = LocalDateTime.now();
         Cart activeCart = new Cart();
         activeCart.setId("1");
-        activeCart.setLastAccessed(now.minusMinutes(5)); // Active cart (not inactive)
+        activeCart.setLastAccessed(now.minusMinutes(5));
 
         List<Cart> activeCarts = Collections.singletonList(activeCart);
-        when(cartRepository.findAll()).thenReturn(activeCarts); // Mock the repository to return only active carts
+        when(cartRepository.findAll()).thenReturn(activeCarts);
 
         cartService.removeInactiveCarts();
 
-        verify(cartRepository, times(0)).deleteByIds(anyList()); // Ensure no carts were deleted
+        verify(cartRepository, times(0)).deleteByIds(anyList());
 
     }
 

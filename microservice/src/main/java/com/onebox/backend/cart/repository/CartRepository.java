@@ -59,14 +59,21 @@ public class CartRepository {
      *                       the given ID.
      */
     public void deleteById(String id) {
-        if (id == null && cartStore.containsKey(id)) {
-            cartStore.remove(id);
-        } else {
-            ErrorCode invalidIdList = ErrorCode.CART_NULL_EMPTY;
-            throw new CartException(invalidIdList.getCode(),
-                    invalidIdList.getMessage(),
-                    invalidIdList.getHttpStatus());
+        if (id == null || id.trim().isEmpty()) {
+            ErrorCode invalidId = ErrorCode.CART_NULL_EMPTY;
+            throw new CartException(invalidId.getCode(),
+                    invalidId.getMessage(),
+                    invalidId.getHttpStatus());
         }
+
+        if (!cartStore.containsKey(id)) {
+            ErrorCode cartNotFound = ErrorCode.CART_NOT_FOUND;
+            throw new CartException(cartNotFound.getCode(),
+                    cartNotFound.getMessage() + " ID: " + id,
+                    cartNotFound.getHttpStatus());
+        }
+
+        cartStore.remove(id);
     }
 
     /**
@@ -86,12 +93,12 @@ public class CartRepository {
      */
     public void deleteByIds(List<String> ids) {
         if (ids == null || ids.isEmpty()) {
-            ids.forEach(this::deleteById);
-        } else {
             ErrorCode invalidIdList = ErrorCode.CART_NULL_EMPTY;
             throw new CartException(invalidIdList.getCode(),
                     invalidIdList.getMessage(),
                     invalidIdList.getHttpStatus());
+        } else {
+            ids.forEach(this::deleteById);
         }
 
     }
