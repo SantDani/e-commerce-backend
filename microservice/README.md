@@ -52,3 +52,11 @@ This project uses **JaCoCo** to measure the test coverage. After running the tes
 
   1. `cart.inactivity.minutes`: cart inactivity timeout (in minutes)
   2. `cart.cleanup.fixedRate`: frequency of checking for inactive carts (in milliseconds)
+
+## Future Improvements
+
+1. **Database Integration**
+
+2. **Reactive Programming (WebFlux)**
+
+3. **Caching**
