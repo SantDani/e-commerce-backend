@@ -158,7 +158,6 @@ public class CartService {
     @Scheduled(fixedRateString = "${cart.cleanup.fixedRate:60000}")
     public void removeInactiveCarts() {
 
-        // TODO: test this method
         LocalDateTime inactiveSince = LocalDateTime.now().minusMinutes(inactivityMinutes);
         String formattedDate = inactiveSince.format(formatter);
 

@@ -1,8 +1,5 @@
 package com.onebox.backend.cart.exception.model;
 
-import lombok.Data;
-
-@Data
 public class ApiExceptionResponse {
 
     private String title;
@@ -19,5 +16,17 @@ public class ApiExceptionResponse {
         this.title = title;
         this.code = code;
         this.detail = null;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public String getDetail() {
+        return detail;
     }
 }

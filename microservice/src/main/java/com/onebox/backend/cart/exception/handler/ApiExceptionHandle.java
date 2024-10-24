@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.onebox.backend.cart.exception.model.ApiExceptionResponse;
 import com.onebox.backend.cart.exception.model.CartException;
+import com.onebox.backend.cart.exception.model.ErrorCode;
 import com.onebox.backend.cart.exception.model.ProductException;
 
 /**
@@ -68,12 +69,12 @@ public class ApiExceptionHandle {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiExceptionResponse> handleGenericException(Exception ex) {
-        String message = "An unexpected error occurred: ";
 
-        logger.error(message, ex);
+        ErrorCode error = ErrorCode.INTERNAL_SERVER_ERROR;
+        logger.error("An unexpected error occurred: ", ex);
 
         ApiExceptionResponse response = new ApiExceptionResponse(
-                message, "GENERIC_ERROR", ex.getMessage());
+                error.getMessage(), error.getCode(), ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

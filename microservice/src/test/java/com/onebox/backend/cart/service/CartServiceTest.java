@@ -178,7 +178,7 @@ public class CartServiceTest {
     }
 
     @Test
-    public void testAddProductsToCartNullProductList() {
+    public void testAddProductsToCartEmptyNullProductList() {
         String cartId = "1";
         Cart cart = new Cart();
         cart.setId(cartId);
@@ -194,7 +194,21 @@ public class CartServiceTest {
         assertEquals(errorCode.getCode(), exception.getCode());
         assertEquals(errorCode.getHttpStatus(), exception.getHttpStatus());
 
+        cart.setId(cartId);
+
+        when(cartRepository.findById(cartId)).thenReturn(cart);
+
+        exception = assertThrows(CartException.class, () -> {
+            cartService.addProductsToCart(cartId, Collections.emptyList());
+        });
+
+        errorCode = ErrorCode.PRODUCT_NULL_EMPTY;
+        assertEquals(errorCode.getMessage(), exception.getMessage());
+        assertEquals(errorCode.getCode(), exception.getCode());
+        assertEquals(errorCode.getHttpStatus(), exception.getHttpStatus());
+
         verify(cartRepository, times(0)).save(any(Cart.class));
+
     }
 
     @Test
@@ -219,6 +233,27 @@ public class CartServiceTest {
         assertEquals(amountNegative.getHttpStatus(), exception.getHttpStatus());
 
         verify(cartRepository, times(1)).findById(cartId);
+        verify(cartRepository, times(0)).save(any(Cart.class));
+
+        // Case not found
+        String invalidCartId = "999";
+
+        when(cartRepository.findById(invalidCartId)).thenReturn(null);
+
+        List<Product> products = Arrays.asList(
+                new Product(1, "Product 1", 10),
+                new Product(2, "Product 2", 5));
+
+        exception = assertThrows(CartException.class, () -> {
+            cartService.addProductsToCart(invalidCartId, products);
+        });
+
+        ErrorCode cartNotFound = ErrorCode.CART_NOT_FOUND;
+        assertEquals(cartNotFound.getMessage() + " ID: " + invalidCartId, exception.getMessage());
+        assertEquals(cartNotFound.getCode(), exception.getCode());
+        assertEquals(cartNotFound.getHttpStatus(), exception.getHttpStatus());
+
+        verify(cartRepository, times(1)).findById(invalidCartId);
         verify(cartRepository, times(0)).save(any(Cart.class));
     }
 
