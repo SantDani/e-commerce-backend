@@ -26,7 +26,7 @@ To deploy the application, follow these simple steps:
    - You can access the Swagger UI at:
      [http://localhost:8180/swagger-ui.html](http://localhost:8180/swagger-ui.html)
 
-![App Screenshot](./images/swagger.png)
+![App Screenshot](./microservice/images/swagger.png)
 
 ## Running Tests
 
@@ -44,7 +44,7 @@ This project uses **JaCoCo** to measure the test coverage. After running the tes
 {workspaceFolder}\microservice\target\site\jacoco\index.html
 ```
 
-![App Screenshot](./images/test-coverage.png)
+![App Screenshot](./microservice/images/test-coverage.png)
 
 ## Additional Notes
 
